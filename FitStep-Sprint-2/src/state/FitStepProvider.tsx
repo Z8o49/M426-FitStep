@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type PropsWithChildren } from 'react';
 import { AppState } from 'react-native';
 import { calendarDaysInclusive, localDateKey } from '../domain/dates';
-import { appReducer, createInitialState, restoreState, selectTotalSteps, selectWeek, type DataMode, type Settings, type WeekDay } from '../domain/model';
+import { appReducer, createInitialState, restoreState, selectTotalSteps, selectWeek, type DataMode, type Settings, type WeekDay, type PersonalGoal } from '../domain/model';
 import { calculateProgress } from '../domain/progress';
 import { usePedometer, type PedometerController } from '../hooks/usePedometer';
 import { appRepository } from '../services/storage';
@@ -13,6 +13,11 @@ interface FitStepContextValue {
   mode: DataMode;
   settings: Settings;
   todaySteps: number;
+  distanceKm: number;
+  goals: PersonalGoal[];
+  addGoal(text: string): void;
+  toggleGoal(id: string): void;
+  deleteGoal(id: string): void;
   totalSteps: number;
   activeDays: number;
   week: WeekDay[];
@@ -86,6 +91,15 @@ export function FitStepProvider({ children }: PropsWithChildren) {
   }, []);
   const addDemoSteps = useCallback((steps: number) => dispatch({ type: 'demo-add', day: localDateKey(), steps }), []);
   const resetDemo = useCallback(() => dispatch({ type: 'demo-reset', today: localDateKey() }), []);
+  const goalSequence = useRef(0);
+  const addGoal = useCallback((text: string) => {
+    goalSequence.current += 1;
+    const createdAt = new Date().toISOString();
+    const id = `${Date.now().toString(36)}-${goalSequence.current}-${Math.random().toString(36).slice(2, 9)}`;
+    dispatch({ type: 'goal-add', goal: { id, text, completed: false, createdAt } });
+  }, []);
+  const toggleGoal = useCallback((id: string) => dispatch({ type: 'goal-toggle', id }), []);
+  const deleteGoal = useCallback((id: string) => dispatch({ type: 'goal-delete', id }), []);
   const saveSettings = useCallback((settings: Settings) => dispatch({ type: 'save-settings', settings }), []);
 
   const retryStorage = useCallback(async () => {
@@ -109,12 +123,13 @@ export function FitStepProvider({ children }: PropsWithChildren) {
     const todaySteps = tracking.stepsByDay[today] ?? 0;
     return {
       hydrated, storageError, today, mode: state.mode, settings: state.settings,
-      todaySteps, totalSteps: selectTotalSteps(tracking, today),
+      todaySteps, distanceKm: todaySteps * 0.75 / 1000, goals: state.goals, addGoal, toggleGoal, deleteGoal,
+      totalSteps: selectTotalSteps(tracking, today),
       activeDays: calendarDaysInclusive(tracking.firstUseDate, today),
       week: selectWeek(tracking, today), progress: calculateProgress(todaySteps, state.settings.dailyGoal),
       sensor, setMode, addDemoSteps, resetDemo, saveSettings, retryStorage,
     };
-  }, [state, today, hydrated, storageError, sensor, setMode, addDemoSteps, resetDemo, saveSettings, retryStorage]);
+  }, [state, today, hydrated, storageError, sensor, setMode, addDemoSteps, resetDemo, saveSettings, retryStorage, addGoal, toggleGoal, deleteGoal]);
 
   return <FitStepContext.Provider value={value}>{children}</FitStepContext.Provider>;
 }

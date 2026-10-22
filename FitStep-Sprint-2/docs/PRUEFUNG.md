@@ -1,11 +1,12 @@
-# Technische Prüfung · Sprint 1
+# Technische Prüfung · Sprint 2
 
 ## Für diese Lieferung durchgeführt
 
 - TypeScript-Prüfung erfolgreich.
 - Expo-Export für Android, iOS und Web erfolgreich.
-- 31 fachliche Tests zu Fortschritt, Kalendertagen, Sensor-Differenzen und Speicherung erfolgreich.
-- Lokaler Browser-Bedientest erfolgreich: Navigation, getrennte Live-/Demodaten, Demo-Schritte, Zielvalidierung, Fortschritt über 100 % und Speicherung nach Neuladen.
+- 41 fachliche Tests erfolgreich, einschliesslich der Übernahme des gespeicherten Sprint-1-Datenformats.
+- Lokaler Browser-Bedientest erfolgreich: echten gespeicherten App-Zustand aus Sprint 1 übernehmen, Namen/Ziel speichern, leere Eingaben ablehnen, eigene Ziele erstellen/abhaken/löschen und nach Neuladen wieder prüfen.
+- Oberfläche bei 320, 393 und 768 Pixel Breite geprüft; kein horizontaler Seitenüberlauf. Die Distanzanzeige und der Wechsel zwischen getrennten Live-/Demodaten wurden geprüft.
 
 ## Auf eurem Gerät noch durchführen
 

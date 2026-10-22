@@ -5,6 +5,14 @@ export type DataMode = 'live' | 'demo';
 
 export interface Settings {
   dailyGoal: number;
+  username: string;
+}
+
+export interface PersonalGoal {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
 }
 
 export interface TrackingData {
@@ -18,6 +26,7 @@ export interface AppData {
   mode: DataMode;
   live: TrackingData;
   demo: TrackingData;
+  goals: PersonalGoal[];
 }
 
 export interface WeekDay {
@@ -34,7 +43,10 @@ export type AppAction =
   | { type: 'live-delta'; day: string; steps: number }
   | { type: 'live-total'; day: string; steps: number }
   | { type: 'demo-add'; day: string; steps: number }
-  | { type: 'demo-reset'; today: string };
+  | { type: 'demo-reset'; today: string }
+  | { type: 'goal-add'; goal: PersonalGoal }
+  | { type: 'goal-toggle'; id: string }
+  | { type: 'goal-delete'; id: string };
 
 export function createDemoData(today: string): TrackingData {
   const sampleSteps = [9650, 12724, 13069, 6819, 4382, 11590, 3655];
@@ -46,11 +58,12 @@ export function createDemoData(today: string): TrackingData {
 
 export function createInitialState(today: string): AppData {
   return {
-    schemaVersion: 1,
-    settings: { dailyGoal: 8000 },
+    schemaVersion: 2,
+    settings: { dailyGoal: 8000, username: 'Nikos' },
     mode: 'live',
     live: { firstUseDate: today, stepsByDay: {} },
     demo: createDemoData(today),
+    goals: [],
   };
 }
 
@@ -72,15 +85,19 @@ function restoreTracking(value: unknown, fallback: TrackingData): TrackingData {
 export function restoreState(value: unknown, today: string): AppData {
   if (value === null || value === undefined) return createInitialState(today);
   const source = asObject(value);
-  if (source.schemaVersion !== 1) throw new Error('Unbekanntes Speicherformat.');
+  if (source.schemaVersion !== 1 && source.schemaVersion !== 2) throw new Error('Unbekanntes Speicherformat.');
   const defaults = createInitialState(today);
   const settings = asObject(source.settings);
   return {
-    schemaVersion: 1,
-    settings: { dailyGoal: typeof settings.dailyGoal === 'number' && isValidGoal(settings.dailyGoal) ? settings.dailyGoal : defaults.settings.dailyGoal },
+    schemaVersion: 2,
+    settings: {
+      dailyGoal: typeof settings.dailyGoal === 'number' && isValidGoal(settings.dailyGoal) ? settings.dailyGoal : defaults.settings.dailyGoal,
+      username: isValidUsername(settings.username) ? settings.username.trim() : defaults.settings.username,
+    },
     mode: source.mode === 'demo' ? 'demo' : 'live',
     live: restoreTracking(source.live, defaults.live),
     demo: restoreTracking(source.demo, defaults.demo),
+    goals: restoreGoals(source.goals),
   };
 }
 
@@ -99,7 +116,9 @@ export function appReducer(state: AppData, action: AppAction): AppData {
     case 'set-mode':
       return action.mode === 'live' || action.mode === 'demo' ? { ...state, mode: action.mode } : state;
     case 'save-settings':
-      return isValidGoal(action.settings.dailyGoal) ? { ...state, settings: { ...action.settings } } : state;
+      return isValidGoal(action.settings.dailyGoal) && isValidUsername(action.settings.username)
+        ? { ...state, settings: { dailyGoal: action.settings.dailyGoal, username: action.settings.username.trim() } }
+        : state;
     case 'live-delta':
       return updateSteps(state, 'live', action.day, action.steps, false);
     case 'live-total':
@@ -108,6 +127,13 @@ export function appReducer(state: AppData, action: AppAction): AppData {
       return state.mode === 'demo' ? updateSteps(state, 'demo', action.day, action.steps, false) : state;
     case 'demo-reset':
       return { ...state, demo: createDemoData(action.today) };
+    case 'goal-add':
+      if (!isValidGoalText(action.goal.text) || state.goals.some(goal => goal.id === action.goal.id)) return state;
+      return { ...state, goals: [...state.goals, { ...action.goal, text: action.goal.text.trim(), completed: false }] };
+    case 'goal-toggle':
+      return { ...state, goals: state.goals.map(goal => goal.id === action.id ? { ...goal, completed: !goal.completed } : goal) };
+    case 'goal-delete':
+      return { ...state, goals: state.goals.filter(goal => goal.id !== action.id) };
   }
 }
 
@@ -124,4 +150,30 @@ export function selectTotalSteps(data: TrackingData, today: string): number {
   return Object.entries(data.stepsByDay)
     .filter(([day]) => day >= data.firstUseDate && day <= today)
     .reduce((total, [, steps]) => total + steps, 0);
+}
+
+export function isValidUsername(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length >= 1 && value.trim().length <= 40;
+}
+
+export function isValidGoalText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length >= 1 && value.trim().length <= 120;
+}
+
+function restoreGoals(value: unknown): PersonalGoal[] {
+  if (!Array.isArray(value)) return [];
+  const ids = new Set<string>();
+  const goals: PersonalGoal[] = [];
+  for (const entry of value) {
+    const goal = asObject(entry);
+    if (typeof goal.id !== 'string' || !goal.id || ids.has(goal.id) || !isValidGoalText(goal.text)) continue;
+    ids.add(goal.id);
+    goals.push({
+      id: goal.id,
+      text: goal.text.trim(),
+      completed: goal.completed === true,
+      createdAt: typeof goal.createdAt === 'string' ? goal.createdAt : '',
+    });
+  }
+  return goals;
 }

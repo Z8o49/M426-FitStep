@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
 import { colors } from './theme';
 
-export type IconName = 'home' | 'steps' | 'settings' | 'arrow' | 'flag' | 'calendar' | 'check' | 'refresh';
+export type IconName = 'home' | 'steps' | 'settings' | 'arrow' | 'flag' | 'calendar' | 'check' | 'refresh' | 'route' | 'trash';
 
 type Props = { name: IconName; size?: number; color?: string };
 
@@ -18,6 +18,8 @@ export function Icon({ name, size = 28, color = colors.text }: Props) {
       {name === 'calendar' && <><Path d="M4 5h16a1.5 1.5 0 0 1 1.5 1.5v14A1.5 1.5 0 0 1 20 22H4a1.5 1.5 0 0 1-1.5-1.5v-14A1.5 1.5 0 0 1 4 5ZM3 10h18M7 2v5M17 2v5" {...common} /><Circle cx="7" cy="14" r="1" fill={color} /><Circle cx="12" cy="14" r="1" fill={color} /><Circle cx="17" cy="14" r="1" fill={color} /><Circle cx="7" cy="18" r="1" fill={color} /><Circle cx="12" cy="18" r="1" fill={color} /></>}
       {name === 'check' && <Path d="m5 12 4.5 4.5L19 7" {...common} />}
       {name === 'refresh' && <><Path d="M20 8a8 8 0 1 0 .2 7M20 3v5h-5" {...common} /></>}
+      {name === 'route' && <><Circle cx="6" cy="4" r="2.3" {...common} /><Circle cx="18" cy="20" r="2.3" {...common} /><Path d="M8.5 4H16a5 5 0 0 1 0 10H8a3 3 0 0 0 0 6h7.5" {...common} /></>}
+      {name === 'trash' && <><Path d="M3 6h18M9 6V3h6v3M5 6l1.4 15h11.2L19 6M10 10v7M14 10v7" {...common} /></>}
     </Svg>
   );
 }

@@ -12,7 +12,7 @@ const statusTitles = {
 const permissionLabels = { unknown: 'wird geprüft', undetermined: 'noch nicht erteilt', granted: 'erlaubt', denied: 'nicht erlaubt' };
 
 export function PedometerScreen() {
-  const { mode, setMode, todaySteps, totalSteps, activeDays, sensor, addDemoSteps, resetDemo } = useFitStep();
+  const { mode, setMode, todaySteps, totalSteps, activeDays, sensor, addDemoSteps, resetDemo, distanceKm } = useFitStep();
   const [actionError, setActionError] = useState<string | null>(null);
   const demo = mode === 'demo';
   const busy = sensor.status === 'checking';
@@ -49,6 +49,14 @@ export function PedometerScreen() {
           <View style={styles.statIcon}><Icon name="steps" size={25} /></View>
           <View style={styles.statContent}><Text style={styles.statLabel}>Schritte total</Text><Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>{formatSteps(totalSteps)}</Text></View>
         </View>
+      </Card>
+      <Card>
+        <Text accessibilityRole="header" style={styles.sectionTitle}>Distanz heute</Text>
+        <View style={styles.statRow}>
+          <View style={styles.statIcon}><Icon name="route" size={25} /></View>
+          <View style={styles.statContent}><Text style={styles.statLabel}>Geschätzte Strecke</Text><Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>{distanceKm.toFixed(2)} km</Text></View>
+        </View>
+        <Text style={styles.description}>Geschätzt mit einer Schrittlänge von 0.75 Metern.</Text>
       </Card>
       <Card>
         <Text accessibilityRole="header" style={styles.sectionTitle}>Datenquelle</Text>
