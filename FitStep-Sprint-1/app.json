@@ -2,7 +2,7 @@
   "expo": {
     "name": "FitStep",
     "slug": "fitstep",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -15,12 +15,23 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#08121B"
       },
-      "predictiveBackGestureEnabled": true
+      "predictiveBackGestureEnabled": true,
+      "permissions": [
+        "android.permission.ACTIVITY_RECOGNITION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "name": "FitStep",
       "backgroundColor": "#08121B"
-    }
+    },
+    "plugins": [
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "FitStep verwendet deine Bewegungsdaten, um deine täglichen Schritte anzuzeigen."
+        }
+      ]
+    ]
   }
 }

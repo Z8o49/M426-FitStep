@@ -14,3 +14,7 @@ export const colors = {
 
 export const spacing = { xs: 6, sm: 10, md: 16, lg: 20, xl: 28 };
 
+export function formatSteps(value: number): string {
+  return Math.max(0, Math.round(value)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+}
+

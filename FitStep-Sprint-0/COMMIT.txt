@@ -1,1 +1,0 @@
-chore(sprint-0): Expo-Grundgerüst und Tab-Navigation
