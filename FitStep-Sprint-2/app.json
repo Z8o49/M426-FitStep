@@ -31,7 +31,8 @@
         {
           "motionPermission": "FitStep verwendet deine Bewegungsdaten, um deine täglichen Schritte anzuzeigen."
         }
-      ]
+      ],
+      "expo-status-bar"
     ]
   }
 }
