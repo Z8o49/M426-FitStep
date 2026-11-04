@@ -1,6 +1,6 @@
 # FitStep · Sprint 2
 
-## Unsere Finale Dokumentation ist die Datei fitstep_doku_scrum.pdf [Hier klicken, um das PDF zu öffnen](/M426-FitStep/fitstep_doku_scrum.pdf)
+## Unsere Finale Dokumentation ist die Datei fitstep_doku_scrum.pdf [Hier klicken, um das PDF zu öffnen](fitstep_doku_scrum.pdf)
 
 
 Expo-Fitness-App für M426. Dieser Stand enthält **Schritte, Tagesziel, Fortschritt, Wochenübersicht, geschätzte Distanz, eigene Ziele und einen gespeicherten Profilnamen**.
